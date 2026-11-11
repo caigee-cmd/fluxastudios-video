@@ -81,6 +81,6 @@ SGP3 的 Host Updater 是 systemd 服务 `open-ai-canvas-updater.service`，程�
 
 - 管理后台 **站点及外观**：Fluxa Studios 名称、SEO、footer、logo、登录视频、黑白电影感皮肤（`fluxa-studios`）。现有数据库配置优先于源码默认值；不要点「恢复默认」来修复皮肤。
 - 源码：`web/src/i18n/messages/areas/`、欢迎页、`use-appearance-store.ts`、助手默认称呼/创作提示词；后端默认品牌、登录提示及短剧导出标题。改源码需重建对应镜像，Nginx 不是长期替代方案。
-- 字体：通过 Fontsource 随镜像本地提供 **DM Sans** 正文、**Space Grotesk** 标题；中文保留系统字体回退，JetBrains Mono 保留给代码；没有新增 Google Fonts 外部依赖。
+- 字体：通过 Fontsource 随镜像本地提供 **DM Sans** 正文、**Space Grotesk** 标题；中文保留系统字体回退，JetBrains Mono 保留给代码；没有新增 Google Fonts 外部依赖。两套字体的 OFL 授权随镜像发布在 `/licenses/DM-Sans-OFL.txt` 与 `/licenses/Space-Grotesk-OFL.txt`。
 - 助手：目前仅支持 orb / live2d / bundle；生产已有 bundle 配置原样保留，默认名字 Fluxa。不把静态 logo 硬塞为头像。要替换形象需可用且有授权的完整 bundle/Live2D 资源，单独验收。
 - 保留官方资产包/姿势包格式名、请求 User-Agent、内部 `yingce` 标识、上游技能原文/作者、社区插件作者、贡献者与第三方影片授权，避免破坏导入兼容或冒领署名。
