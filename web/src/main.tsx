@@ -1,4 +1,5 @@
-import "@fontsource-variable/inter";
+import "@fontsource-variable/dm-sans";
+import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/jetbrains-mono";
 import { installChunkRecovery } from "@/lib/chunk-recovery";
 import { bootstrapAppearance } from "@/services/appearance-bootstrap";

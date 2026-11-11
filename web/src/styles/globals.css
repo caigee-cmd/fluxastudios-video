@@ -17,10 +17,10 @@
    Layer 1: Primitive — 纯值，无语义，不随主题变（所有维度的基础）
    ------------------------------------------------------------------------- */
 :root {
-    /* --- 0. 字体（composio：Inter + 开源等宽；@theme inline 自引用解析点）--- */
-    --font-sans: "Inter Variable", "Inter", "Inter Fallback", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+    /* --- 0. Fluxa 字体：正文 DM Sans，标题 Space Grotesk；中文保留系统回退。--- */
+    --font-sans: "DM Sans Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    --font-heading: "Inter Variable", "Inter", "Inter Fallback", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+    --font-heading: "Space Grotesk Variable", "DM Sans Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
     /* --- 1. 色彩（oklch 色板）--- */
     /* 中性色带极轻的冷色倾向（hue 286，与 --user-* 同色相），避免纯白纯灰。 */
     --color-neutral-0: oklch(1 0 0);
@@ -704,7 +704,7 @@
     --radius-md: 8px;
     --radius-lg: 8px;
     --radius-xl: 12px;
-    --font-heading: var(--font-sans);
+    --font-heading: var(--font-heading);
     --font-sans: var(--font-sans);
     --font-mono: var(--font-mono);
     --color-sidebar-ring: var(--sidebar-ring);
@@ -1422,6 +1422,7 @@
     h2,
     h3,
     h4 {
+        font-family: var(--font-heading);
         line-height: var(--lh-heading);
     }
     h1,
@@ -1458,16 +1459,6 @@
     button:not(:disabled):not([role="switch"]):not([data-no-press]):active {
         scale: 0.97;
     }
-}
-
-/* Inter 加载完成前的后备字体按 Inter 的字面尺寸校准，避免字体切换时文字跳动。 */
-@font-face {
-    font-family: "Inter Fallback";
-    src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
-    size-adjust: 107.06%;
-    ascent-override: 90.49%;
-    descent-override: 22.56%;
-    line-gap-override: 0%;
 }
 
 /* 工作台主滚动区预留滚动条空间，列表变长时页面不左右跳。 */

@@ -1,3 +1,5 @@
+> **Fluxa Studios 品牌分支**：本站使用本仓库自建镜像；SGP3 运维、发布、回滚和邮件/注册保护见 [Fluxa Studios 运维速查](docs/fluxa-studios-ops.md)。以下保留上游影策的功能介绍与署名。
+
 <p align="center">
   <img src="web/public/logo.svg" width="88" alt="影策 logo">
 </p>
