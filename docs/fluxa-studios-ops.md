@@ -30,7 +30,7 @@ for part in web backend; do
 done
 ```
 
-先用有 `write:packages` 的账号登录 GHCR，Token 只能经密码标准输入或凭据管理器，不能写进命令、文档或 Git。发布不等于自动部署。
+先用有 `write:packages` 的账号登录 GHCR，Token 只能经密码标准输入或凭据管理器，不能写进命令、文档或 Git。发布不等于自动部署。Quality checks 固定 Ubuntu 24.04；Redis 测试二进制来自官方 `redis:7.4-bookworm`，不用 apt 源，所有依赖测试仍须通过。
 
 ### SGP3 部署 / 回滚
 
