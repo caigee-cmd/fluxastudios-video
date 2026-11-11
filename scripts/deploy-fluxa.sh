@@ -38,8 +38,17 @@ if [[ -f $unit && ! -L $unit ]]; then mv "$unit" "$backup/open-ai-canvas-updater
 systemctl mask open-ai-canvas-updater.service
 systemctl daemon-reload
 "${compose[@]}" config --quiet
-# Always reattach SMTP immediately after the backend recreation attempt, even on failure.
+# New backend images may require a newer schema. Migrate while the old/new
+# backend is stopped, so an older binary never sees a newer schema, and a
+# newer binary is never started against an older schema.
 status=0
+"${compose[@]}" stop backend || true
+"${compose[@]}" run --rm migrate || status=$?
+if [[ $status != 0 ]]; then
+  echo "数据库迁移失败；备份: $backup。未启动新后端。"
+  exit "$status"
+fi
+# Always reattach SMTP immediately after the backend recreation attempt, even on failure.
 "${compose[@]}" up -d --no-deps --force-recreate backend || status=$?
 (cd /root/fluxa-smtp-bridge && docker compose up -d --no-deps --force-recreate fluxa-smtp-bridge)
 [[ $status == 0 ]] || { echo "后端重建失败；备份: $backup"; exit "$status"; }

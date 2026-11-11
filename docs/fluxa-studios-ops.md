@@ -34,7 +34,7 @@ done
 
 ### SGP3 部署 / 回滚
 
-1. 备份数据库与数据卷；本次同版本品牌变更无 schema 变更，不运行迁移、不重建数据库。
+1. 备份数据库与数据卷。本分支后端要求 schema **99**（`site_traffic_events`，相对官方 `v1.8.4.1` 的 98 多一张访问统计表，迁移是加表，不改已有业务数据）。部署脚本会在启动新后端前执行 `migrate-schema up`；已是 99 时该步骤是幂等的。不要在仍运行官方 1.8.4.1 后端时先升到 99，否则旧后端会因结构过新而拒绝启动。
 2. 拉取目标 web/backend 的固定 SHA 或 digest。新 GHCR 包可能是私有：若服务器无读取权限，**不要复制个人 Token**；下载成功发布流程的 `fluxastudios-web-amd64`、`fluxastudios-backend-amd64` 制品，核对运行提交，然后 `gunzip -c *.tar.gz | docker load`（每个文件分别执行）。制品仅保留 3 天，镜像长期在 GHCR；有权限时使用 `docker pull` 即可。
 3. 把仓库 `scripts/deploy-fluxa.sh` 复制到 SGP3，以 root 运行：
 
@@ -44,9 +44,9 @@ bash deploy-fluxa.sh \
   ghcr.io/caigee-cmd/fluxastudios-backend:sha-<完整提交>
 ```
 
-脚本只改 `.env` 的两个镜像项，原文件及 Compose 备份在 `/root/fluxa-studios-ops/backups/<时间>/`（勿公开备份）。它先要求镜像已在本机、注册关闭、邮件开启、协议存在、web 绑定 localhost，再停止并 mask 官方更新器，只重建 backend 和 web；backend 重建后**立即**重建 SMTP bridge，不等 cron。migrate 引用同一个 backend 镜像，但不会执行。
+脚本只改 `.env` 的两个镜像项，原文件及 Compose 备份在 `/root/fluxa-studios-ops/backups/<时间>/`（勿公开备份）。它先要求镜像已在本机、注册关闭、邮件开启、协议存在、web 绑定 localhost，再停止并 mask 官方更新器，**先停止 backend 并运行 migrate**，再重建 backend 和 web；backend 重建后**立即**重建 SMTP bridge，不等 cron。
 
-回滚优先传入上一版**自建镜像**的 SHA/digest，运行同一脚本。首次切换前的官方镜像仅作紧急救援，恢复后品牌源码会退回，不是常规发布；不要恢复官方更新器。只回滚镜像时不恢复数据库或整个 `.env`，避免覆盖后续邮件、站点配置。
+回滚优先传入上一版**同样支持当前 schema 的自建镜像** SHA/digest，运行同一脚本。生产库升到 99 之后，不要把后端退回官方 `v1.8.4.1`（它只支持到 98，会拒绝连接）。不要恢复官方更新器。只回滚镜像时不恢复数据库或整个 `.env`，避免覆盖后续邮件、站点配置。
 
 ### 验收（在 SGP3 上执行）
 
@@ -68,7 +68,7 @@ SGP3 的 Host Updater 是 systemd 服务 `open-ai-canvas-updater.service`，程�
 ## 3. 网络、邮件与注册不变量
 
 - `/opt/open-ai-canvas/docker-compose.deploy.yml` 的 web 必须是 `127.0.0.1:${CANVAS_HTTP_PORT:-3000}:3000`。Nginx 负责 LE HTTPS、主站/preview 代理到本机 3000。
-- 保留 `/etc/nginx/snippets/fluxa-brand-subfilter.conf`（主站及 preview 引用），作为历史静态资源的兜底；新镜像不依赖它替换品牌。
+- 保留 `/etc/nginx/snippets/fluxa-brand-subfilter.conf`（主站及 preview 引用），作为历史静态资源的兜底；新镜像不依赖它替换品牌。web 容器把 `open-ai-canvas_web-data` 挂到 `/usr/share/nginx/html`，旧哈希的 JS 可能仍留在卷里，但首页会引用本次构建的文件；验收看当前 index 引用的 welcome/i18n，必要时强制刷新。
 - 端口守护 `/root/fluxa-studios-ops/watchdog.py`：root cron 每 2 分钟，仅在 web 绑定错误时修复并重建 web，不动 backend。
 - 邮件桥目录 `/root/fluxa-smtp-bridge`，容器及 Compose service 均为 `fluxa-smtp-bridge`，`network_mode: container:open-ai-canvas-backend-1`；守护 `/root/fluxa-smtp-bridge/watchdog.sh` 每 2 分钟运行。
 - **任何 backend recreate 后立刻执行** `cd /root/fluxa-smtp-bridge && docker compose up -d --no-deps --force-recreate fluxa-smtp-bridge`。旧 namespace 会断邮件，不能等守护。
