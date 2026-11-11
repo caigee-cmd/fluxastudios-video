@@ -16,7 +16,7 @@ concurrency:
 jobs:
   agent-lint:
     name: Agent architecture and static checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     defaults:
       run:
@@ -41,7 +41,7 @@ jobs:
   # 这里把它按用例名轮转分成 4 片，其余包作为第 5 片，5 个 Runner 并行；汇总由 Backend checks 完成。
   backend-tests:
     name: Backend tests (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # go test 自身有 20 分钟超时；这里兜底防止依赖服务卡死时占用 Runner 数小时。
     timeout-minutes: 30
     strategy:
@@ -85,11 +85,16 @@ jobs:
         working-directory: backend/agent-runtime/pi
         run: npm ci --omit=dev --ignore-scripts
       - name: Install redis-server for integration tests
-        # 用例自己拉起临时 redis-server（unix socket），所以需要的是可执行文件而不是 redis 服务。
+        # 用例需要本机可执行文件及临时 unix socket，不需要系统服务。
+        # 从官方 glibc 镜像取二进制，避免 apt 镜像/DNS 故障跳过依赖用例。
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq redis-server
-          sudo systemctl stop redis-server || true
+          mkdir -p "$RUNNER_TEMP/redis-bin"
+          container=$(docker create redis:7.4-bookworm)
+          trap 'docker rm "$container" >/dev/null' EXIT
+          docker cp "$container:/usr/local/bin/redis-server" "$RUNNER_TEMP/redis-bin/redis-server"
+          chmod +x "$RUNNER_TEMP/redis-bin/redis-server"
+          "$RUNNER_TEMP/redis-bin/redis-server" --version
+          echo "$RUNNER_TEMP/redis-bin" >> "$GITHUB_PATH"
       - name: Check formatting
         if: matrix.shard == 'rest'
         shell: bash
@@ -135,7 +140,7 @@ jobs:
     name: Backend checks
     needs: backend-tests
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -172,7 +177,7 @@ jobs:
 
   payment-plugins:
     name: Payment plugin artifacts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Verify canonical payment packages
@@ -198,7 +203,7 @@ jobs:
 
   web:
     name: Web checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:

@@ -21,7 +21,7 @@ elif [[ "$GITHUB_REF" == refs/heads/main ]]; then
   current_sha=$(gh api "repos/${GITHUB_REPOSITORY:?}/git/ref/heads/main" --jq '.object.sha')
   [[ "$current_sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Invalid main branch SHA" >&2; exit 1; }
   if [[ "$current_sha" == "$GITHUB_SHA" ]]; then
-    tags+=(--tag "$IMAGE:latest")
+    tags+=(--tag "$IMAGE:latest" --tag "$IMAGE:${VERSION_TAG:?}-fluxa")
   else
     echo 'A newer main commit exists; leaving latest unchanged.'
   fi

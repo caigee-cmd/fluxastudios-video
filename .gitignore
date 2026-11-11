@@ -99,3 +99,6 @@ backend/tmp_*
 .zocde/
 # Generated locally by scripts/export-theme-skins.ts.
 /web/theme-skins-install.js
+
+# Fluxa production runbook must ship with the fork.
+!docs/fluxa-studios-ops.md

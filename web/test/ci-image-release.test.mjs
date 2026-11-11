@@ -83,7 +83,8 @@ describe("digest promotion", () => {
         expect(repo.call()).toContain("ghcr.io/fixture/image:latest");
         expect(repo.call()).toContain(`ghcr.io/fixture/image@sha256:${digest}`);
         expect(repo.call()).toContain(`ghcr.io/fixture/image:sha-${sha}`);
-        expect(repo.call()).not.toContain("ghcr.io/fixture/image:1.5.5");
+        expect(repo.call()).toContain("ghcr.io/fixture/image:1.5.5-fluxa\n");
+        expect(repo.call()).not.toContain("ghcr.io/fixture/image:1.5.5\n");
     });
     test("stale main cannot roll latest back", () => {
         const repo = fixture({ MOCK_MAIN: "c".repeat(40) });
