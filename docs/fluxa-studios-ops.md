@@ -84,3 +84,7 @@ SGP3 的 Host Updater 是 systemd 服务 `open-ai-canvas-updater.service`，程�
 - 字体：通过 Fontsource 随镜像本地提供 **DM Sans** 正文、**Space Grotesk** 标题；中文保留系统字体回退，JetBrains Mono 保留给代码；没有新增 Google Fonts 外部依赖。两套字体的 OFL 授权随镜像发布在 `/licenses/DM-Sans-OFL.txt` 与 `/licenses/Space-Grotesk-OFL.txt`。
 - 助手：目前仅支持 orb / live2d / bundle；生产已有 bundle 配置原样保留，默认名字 Fluxa。不把静态 logo 硬塞为头像。要替换形象需可用且有授权的完整 bundle/Live2D 资源，单独验收。
 - 保留官方资产包/姿势包格式名、请求 User-Agent、内部 `yingce` 标识、上游技能原文/作者、社区插件作者、贡献者与第三方影片授权，避免破坏导入兼容或冒领署名。
+
+## 5. 积分说明与配置维护
+
+用户可见的兑换说明、生成估价和流水文案见 [fluxa-credit-explanation.md](./fluxa-credit-explanation.md)。那份文档列出了未公布的有效期/提现/充值退款政策，以及上架积分套餐时如何与默认 1 元 1 积分对齐。不要在未公布政策前把它写成永久有效或一概不退。

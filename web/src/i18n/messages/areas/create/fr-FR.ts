@@ -213,4 +213,15 @@ export const frFR: DeepStringRecord<typeof zhCN> = {
         uploadHintImage: "Images ; enregistrées dans la bibliothèque après import",
         uploadHintEagle: "Écrit dans le dossier Eagle actuel ; Eagle n'accepte actuellement que les images",
     },
+    credits: {
+        estimating: "Estimation…",
+        unavailable: "Estimation indisponible",
+        hint: "Les frais sont estimés d’après le modèle et les paramètres actuels, puis réglés après un succès. Un échec avéré restitue la réserve ; un délai d’attente ou un échec d’enregistrement passe en vérification.",
+        estimatedAmount: "Est. {{amount}}",
+        amount: "{{amount}}",
+        sendWithEstimate: "Estimation {{amount}} crédits, envoyer",
+        sendWithAmount: "Utiliser {{amount}} crédits, envoyer",
+        generateWithEstimate: "Estimation {{amount}} crédits, générer",
+        generateWithAmount: "Utiliser {{amount}} crédits, générer",
+    },
 };

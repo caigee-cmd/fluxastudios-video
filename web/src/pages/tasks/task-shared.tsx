@@ -1,7 +1,7 @@
 import { Coins, FileText, Image as ImageIcon, Video, type LucideIcon } from "lucide-react";
 
 import { CONTENT_MODERATION_ERROR_CODE, generationErrorMessage, isContentModerationError } from "@/lib/generation-error";
-import { taskBillingDisplay, taskBillingLabel } from "@/lib/generation-task-billing";
+import { taskBillingDisplay, taskBillingTitle } from "@/lib/generation-task-billing";
 import { generationTaskStatusLabel, mediaDeliverySummary } from "@/lib/generation-task-display";
 import type { GenerationTask } from "@/services/api/task-center";
 import { modelDisplayName, type AiConfig } from "@/stores/use-config-store";
@@ -89,7 +89,7 @@ export function TaskBilling({ billing }: { billing?: GenerationTask["billing"] }
     if (!billing) return <span className="task-center-muted">-</span>;
     const display = taskBillingDisplay(billing);
     return (
-        <span className="task-center-billing" data-tone={display.tone} title={taskBillingLabel(billing)}>
+        <span className="task-center-billing" data-tone={display.tone} title={taskBillingTitle(billing)}>
             <Coins aria-hidden="true" />
             <span>
                 <strong>{display.amount}</strong>

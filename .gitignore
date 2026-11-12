@@ -102,3 +102,4 @@ backend/tmp_*
 
 # Fluxa production runbook must ship with the fork.
 !docs/fluxa-studios-ops.md
+!docs/fluxa-credit-explanation.md

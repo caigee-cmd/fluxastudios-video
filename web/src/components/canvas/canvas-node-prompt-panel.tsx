@@ -2,6 +2,7 @@ import { mediaSettingIssues } from "@/lib/media-settings";
 import { Button, InputNumber, Modal } from "antd";
 import { Tooltip } from "@/components/ui/base/tooltip";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { ArrowUp, ChevronDown, FileText, ImagePlus, LayoutList, LoaderCircle, Maximize2, Music2, SlidersHorizontal, Video, X, PenLine } from "lucide-react";
 
 import { ModelPicker } from "@/components/model-picker";
@@ -11,10 +12,12 @@ import { PROMPT_EDITOR_VIEWPORT_MARGIN, insertPromptReferenceAtSelection } from 
 import { useCanvasPromptPreferencesStore } from "@/stores/canvas/use-canvas-prompt-preferences-store";
 import { CanvasPromptFontSizeControl } from "./canvas-prompt-font-size-control";
 import { CreditSymbol, requestCreditCost } from "@/constant/credits";
+import { useRouteModelQuote } from "@/hooks/use-route-model-quote";
 import { canvasThemes } from "@/lib/canvas-theme";
-import { modelQuoteDescription, modelQuoteRequest } from "@/lib/model-pricing";
+import { modelQuoteRequest } from "@/lib/model-pricing";
+import { composerQuoteView } from "@/lib/route-quote-display";
 import { modelRequestOptions, defaultImageParamsForModel, type ModelRequirements } from "@/lib/model-selection";
-import { useGenerationBatchLimit, batchQuoteTotal } from "@/lib/generation-batch-limit";
+import { useGenerationBatchLimit } from "@/lib/generation-batch-limit";
 import { getGenerationCount } from "@/lib/canvas/canvas-project-generation";
 import { referenceImageSizeSelection, type ImageDimensions } from "@/lib/canvas/canvas-reference-image-size";
 import { navigateToSettings } from "@/lib/settings-navigation";
@@ -50,7 +53,6 @@ import { promptOptimizerPlugin, PROMPT_OPTIMIZER_PLUGIN_ID } from "@/lib/plugins
 import { createPluginHostContext } from "@/services/plugin-host";
 import { usePluginStore } from "@/stores/use-plugin-store";
 import { useResolvedCanvasResourceReferences } from "./use-resolved-canvas-resource-references";
-import { quoteModel, type LogicalModelQuote } from "@/services/api/logical-models";
 import { ConnectedReferenceShelf, ReferenceToolsPopover, referenceShelfHeading } from "./canvas-node-prompt-references";
 import { PromptModalResizeHandle, PromptResizeHandle, clampExpandedModalSize, clampPromptHeight, estimatePromptContentHeight, promptEditorBounds } from "./canvas-node-prompt-resize";
 import { audioConfigPatch, buildNodeConfig, defaultMode, modeDisplayName, promptPlaceholder, videoConfigPatch } from "./canvas-node-prompt-config";
@@ -123,6 +125,7 @@ export function CanvasNodePromptPanel({
     const themeName = useActiveTheme();
     const theme = canvasThemes[themeName];
     const creditsEnabled = useUserStore((state) => state.features.creditsEnabled);
+    const { t } = useTranslation();
     // 画布节点选几张等于拆几单，上限按账号同时任务数。
     const batchLimit = useGenerationBatchLimit();
     const promptOptimizerInstallation = usePluginStore((state) => state.installations.find((item) => item.manifest.id === PROMPT_OPTIMIZER_PLUGIN_ID));
@@ -231,9 +234,15 @@ export function CanvasNodePromptPanel({
     // 服务端按单任务报价，图片按每单 1 张询价，显示时再乘实际单数。
     const quoteRequirements: ModelRequirements = mode === "image" ? { ...resolvedRequirements, options: { ...resolvedRequirements.options, count: 1 } } : resolvedRequirements;
     const quoteRequest = modelQuoteRequest(config, config.model, mode, quoteRequirements);
-    const quoteRequestKey = JSON.stringify(quoteRequest || null);
-    const [routeQuote, setRouteQuote] = useState<LogicalModelQuote | null>(null);
-    const credits = routeQuote ? batchQuoteTotal(routeQuote.amountMicrocredits, mode === "image" ? generationCount : 1) : configuredCredits;
+    const { quote: routeQuote, status: routeQuoteStatus } = useRouteModelQuote(Boolean(creditsEnabled && quoteRequest), quoteRequest);
+    const quoteView = composerQuoteView({
+        enabled: Boolean(creditsEnabled),
+        hasQuoteRequest: Boolean(quoteRequest),
+        status: routeQuoteStatus,
+        quote: routeQuote,
+        taskCount: mode === "image" ? generationCount : 1,
+        localCredits: configuredCredits,
+    });
     const activeReferenceCount = activeReferences.length;
     const videoFrameOptions = resolvedMentionReferences.filter((item) => item.active && item.kind === "image").map((item) => ({ nodeId: item.nodeId, label: item.label, title: item.title, previewUrl: item.previewUrl }));
     const hasVideoPromptTools = mode === "video" && !simpleMode && videoFrameOptions.length > 0;
@@ -296,23 +305,6 @@ export function CanvasNodePromptPanel({
         window.addEventListener("resize", constrainSize);
         return () => window.removeEventListener("resize", constrainSize);
     }, [expandedPromptOpen]);
-
-    useEffect(() => {
-        if (!creditsEnabled || !quoteRequest) {
-            setRouteQuote(null);
-            return;
-        }
-        const controller = new AbortController();
-        setRouteQuote(null);
-        quoteModel(quoteRequest, controller.signal)
-            .then(({ quote }) => setRouteQuote(quote))
-            .catch(() => {
-                if (!controller.signal.aborted) setRouteQuote(null);
-            });
-        return () => controller.abort();
-        // quoteRequestKey captures the full normalized request without retriggering on object identity.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [creditsEnabled, quoteRequestKey]);
 
     const skillReferences = useMemo(() => resolvedMentionReferences.filter((item) => item.kind === "skill"), [resolvedMentionReferences]);
 
@@ -477,9 +469,12 @@ export function CanvasNodePromptPanel({
                     {settingsError}
                 </span>
             );
-        const showCost = creditsEnabled && credits !== null;
-        const formattedCredits = credits?.toLocaleString("zh-CN", { maximumFractionDigits: 6 });
-        const actionLabel = isRunning ? "生成中" : showCost ? `${routeQuote?.estimated ? "预估" : "消耗"} ${formattedCredits} 积分，生成` : "生成";
+        const showCost = quoteView.kind === "ready" || quoteView.kind === "loading";
+        const formattedCredits = quoteView.kind === "ready" ? quoteView.credits.toLocaleString("zh-CN", { maximumFractionDigits: 6 }) : "";
+        const costAction = quoteView.kind === "ready" ? t(quoteView.estimated ? "create.credits.generateWithEstimate" : "create.credits.generateWithAmount", { amount: formattedCredits }) : quoteView.kind === "loading" ? t("create.credits.estimating") : quoteView.kind === "unavailable" ? t("create.credits.unavailable") : "";
+        const creditHint = creditsEnabled ? t("create.credits.hint") : "";
+        const costTitle = [creditHint, quoteView.kind === "ready" ? quoteView.description : ""].filter(Boolean).join(" ");
+        const actionLabel = isRunning ? "生成中" : costAction || "生成";
         return (
             <Button
                 type="text"
@@ -494,12 +489,17 @@ export function CanvasNodePromptPanel({
                 }
                 onClick={() => (expanded ? submitExpandedPrompt() : submit())}
                 aria-label={actionLabel}
-                title={routeQuote ? modelQuoteDescription(routeQuote) : actionLabel}
+                title={costTitle || actionLabel}
             >
-                {showCost ? (
-                    <span className="canvas-node-composer-submit-cost">
+                {quoteView.kind === "loading" ? (
+                    <span className="canvas-node-composer-submit-cost is-pending" aria-live="polite">
                         <CreditSymbol />
-                        <span>{routeQuote?.estimated ? `预估:${formattedCredits}` : formattedCredits}</span>
+                        <span>{t("create.credits.estimating")}</span>
+                    </span>
+                ) : quoteView.kind === "ready" ? (
+                    <span className="canvas-node-composer-submit-cost" title={costTitle}>
+                        <CreditSymbol />
+                        <span>{t(quoteView.estimated ? "create.credits.estimatedAmount" : "create.credits.amount", { amount: formattedCredits })}</span>
                     </span>
                 ) : null}
                 <span className="canvas-node-composer-submit-action" aria-hidden>

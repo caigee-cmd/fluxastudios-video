@@ -482,3 +482,34 @@
         transition: none;
     }
 }
+
+/* 充值说明：黑白灰表面，不引入品牌色块。 */
+.wallet-topup-policy {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid color-mix(in srgb, var(--user-ink, #111) 10%, transparent);
+    border-radius: 8px;
+    background: var(--user-surface-muted, transparent);
+    color: color-mix(in srgb, var(--user-ink, #111) 72%, transparent);
+    font-size: var(--fs-tiny, 12px);
+    line-height: 1.55;
+}
+
+.wallet-topup-policy p {
+    margin: 0 0 6px;
+}
+
+.wallet-topup-policy p:last-child,
+.wallet-topup-policy details p {
+    margin: 0;
+}
+
+.wallet-topup-policy details {
+    margin-top: 2px;
+}
+
+.wallet-topup-policy summary {
+    cursor: pointer;
+    color: var(--user-ink, #111);
+}
