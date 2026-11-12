@@ -241,14 +241,16 @@ export const deDE: DeepStringRecord<typeof zhCN> = {
         redeemPlaceholder: "32-stelligen Einlösecode eingeben",
         redeemSubmit: "Einlösen",
         historyDescription: "Enthält Aufladungen, Einlösungen, Reservierungen, erfolgreiche Abrechnung, Rückgaben nach eindeutigem Fehlschlag und zur Prüfung ausstehende Posten.",
-        historyBillingHint: "Bei der Generierung werden Credits zuerst reserviert und nach Erfolg abgerechnet. Ein eindeutiger Fehlschlag ohne Erfolgsnachweis gibt die Reservierung zurück. Wenn der Upstream erfolgreich war, das lokale Speichern aber fehlschlug, oder ein Timeout den Status unklar lässt, bleibt der Betrag zur Prüfung und wird nicht automatisch als Fehlschlag erstattet.",
+        historyBillingHint:
+            "Bei der Generierung werden Credits zuerst reserviert und nach Erfolg abgerechnet. Ein eindeutiger Fehlschlag ohne Erfolgsnachweis gibt die Reservierung zurück. Wenn der Upstream erfolgreich war, das lokale Speichern aber fehlschlug, oder ein Timeout den Status unklar lässt, bleibt der Betrag zur Prüfung und wird nicht automatisch als Fehlschlag erstattet.",
         historyLoadFailed: "Einträge konnten nicht geladen werden",
         historyEmpty: "Noch keine Credit-Einträge",
         historyEmptyHint: "Nach Aufladungen, Einlösungen oder Generierungsaufgaben erscheinen hier Einträge.",
         pageOf: "Seite {{page}} / {{total}}",
         ledger: {
             reserve: "Reservierung",
-            reserveHint: "Credits werden zu Beginn der Generierung reserviert und nach Erfolg abgerechnet. Ein eindeutiger Fehlschlag ohne Erfolgsnachweis gibt die Reservierung zurück. Timeouts oder ein Upstream-Erfolg, der lokal nicht gespeichert werden konnte, gehen in die Prüfung und werden nicht automatisch als Fehlschlag erstattet.",
+            reserveHint:
+                "Credits werden zu Beginn der Generierung reserviert und nach Erfolg abgerechnet. Ein eindeutiger Fehlschlag ohne Erfolgsnachweis gibt die Reservierung zurück. Timeouts oder ein Upstream-Erfolg, der lokal nicht gespeichert werden konnte, gehen in die Prüfung und werden nicht automatisch als Fehlschlag erstattet.",
             consume: "Abgerechnet",
             consumeHint: "Anhand des erfolgreichen Ergebnisses abgerechnet. Lag die Reservierung über dem Endbetrag, wird die Differenz als Rückgabe erfasst.",
             refund: "Reservierung zurückgegeben",
@@ -308,8 +310,8 @@ export const deDE: DeepStringRecord<typeof zhCN> = {
             policySelectedDiffers: "Dieses Paket weicht vom Standardkurs 1 CNY = 1 Credit ab; maßgeblich ist die ausgewiesene Credit-Menge.",
             policyUnspecified: "Gültigkeit der Credits, Auszahlung des Guthabens und Erstattung von Aufladezahlungen sind noch nicht veröffentlicht; hier wird nichts zugesagt.",
             policyBillingSummary: "Wie die Generierung abgerechnet wird",
-            policyBillingDetail: "Bei der Generierung wird zuerst reserviert und nach erfolgreichem Ergebnis abgerechnet. Ein eindeutiger Fehlschlag ohne Erfolgsnachweis gibt die reservierten Credits zurück. War der Upstream erfolgreich, das lokale Speichern aber nicht, oder lässt ein Timeout den Status unklar, geht der Eintrag in die Prüfung und wird nicht automatisch als Fehlschlag erstattet. Details stehen unter dem Verlauf.",
-
+            policyBillingDetail:
+                "Bei der Generierung wird zuerst reserviert und nach erfolgreichem Ergebnis abgerechnet. Ein eindeutiger Fehlschlag ohne Erfolgsnachweis gibt die reservierten Credits zurück. War der Upstream erfolgreich, das lokale Speichern aber nicht, oder lässt ein Timeout den Status unklar, geht der Eintrag in die Prüfung und wird nicht automatisch als Fehlschlag erstattet. Details stehen unter dem Verlauf.",
         },
     },
     payment: {

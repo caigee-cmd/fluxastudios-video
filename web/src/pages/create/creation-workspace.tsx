@@ -259,7 +259,14 @@ export function CreationComposer(props: ComposerProps) {
     });
     const showCost = quoteView.kind === "ready" || quoteView.kind === "loading";
     const formattedCredits = quoteView.kind === "ready" ? quoteView.credits.toLocaleString("zh-CN", { maximumFractionDigits: 6 }) : "";
-    const costAction = quoteView.kind === "ready" ? t(quoteView.estimated ? "create.credits.sendWithEstimate" : "create.credits.sendWithAmount", { amount: formattedCredits }) : quoteView.kind === "loading" ? t("create.credits.estimating") : quoteView.kind === "unavailable" ? t("create.credits.unavailable") : "";
+    const costAction =
+        quoteView.kind === "ready"
+            ? t(quoteView.estimated ? "create.credits.sendWithEstimate" : "create.credits.sendWithAmount", { amount: formattedCredits })
+            : quoteView.kind === "loading"
+              ? t("create.credits.estimating")
+              : quoteView.kind === "unavailable"
+                ? t("create.credits.unavailable")
+                : "";
     const creditHint = creditsEnabled ? t("create.credits.hint") : "";
     const costTitle = [creditHint, quoteView.kind === "ready" ? quoteView.description : ""].filter(Boolean).join(" ");
     const actionLabel = props.referenceReplacementBusy ? "正在替换参考图" : interactionBusy || (props.generationActive && !canSubmit) ? "生成中" : costAction || "发送";

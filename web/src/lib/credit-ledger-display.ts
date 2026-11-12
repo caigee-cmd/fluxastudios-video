@@ -1,12 +1,6 @@
 import type { CreditLedgerEntry } from "@/services/api/wallet";
 
-export type LedgerDisplayType =
-    | CreditLedgerEntry["type"]
-    | "reserve"
-    | "signup_bonus"
-    | "checkin_bonus"
-    | "admin_grant"
-    | "admin_adjustment";
+export type LedgerDisplayType = CreditLedgerEntry["type"] | "reserve" | "signup_bonus" | "checkin_bonus" | "admin_grant" | "admin_adjustment";
 
 /** 展示用的有符号微积分：预冻结流水可能只写了可用/冻结差额，未填 amount。 */
 export function ledgerSignedMicrocredits(entry: Pick<CreditLedgerEntry, "type" | "amountMicrocredits" | "availableDeltaMicrocredits" | "reservedDeltaMicrocredits">) {

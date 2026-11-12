@@ -241,14 +241,16 @@ export const frFR: DeepStringRecord<typeof zhCN> = {
         redeemPlaceholder: "Saisissez le code d'échange de 32 caractères",
         redeemSubmit: "Échanger",
         historyDescription: "Comprend recharges, échanges, pré-autorisations, règlements réussis, restitutions après un échec avéré et éléments en attente de vérification.",
-        historyBillingHint: "La génération place d’abord une réserve, puis règle en cas de succès. Un échec avéré sans preuve de succès restitue la réserve. Si l’amont a réussi mais que l’enregistrement local a échoué, ou si un délai laisse le statut incertain, les frais restent à vérifier et ne sont pas automatiquement remboursés comme un échec.",
+        historyBillingHint:
+            "La génération place d’abord une réserve, puis règle en cas de succès. Un échec avéré sans preuve de succès restitue la réserve. Si l’amont a réussi mais que l’enregistrement local a échoué, ou si un délai laisse le statut incertain, les frais restent à vérifier et ne sont pas automatiquement remboursés comme un échec.",
         historyLoadFailed: "Échec du chargement des enregistrements",
         historyEmpty: "Aucun enregistrement de crédits",
         historyEmptyHint: "Les enregistrements apparaîtront ici après une recharge, un échange ou une génération.",
         pageOf: "Page {{page}} / {{total}}",
         ledger: {
             reserve: "Pré-autorisation",
-            reserveHint: "Les crédits sont réservés au début de la génération et réglés après un succès. Un échec avéré sans preuve de succès restitue la réserve. Les délais d’attente ou un succès amont non enregistré localement passent en vérification et ne sont pas automatiquement traités comme un remboursement d’échec.",
+            reserveHint:
+                "Les crédits sont réservés au début de la génération et réglés après un succès. Un échec avéré sans preuve de succès restitue la réserve. Les délais d’attente ou un succès amont non enregistré localement passent en vérification et ne sont pas automatiquement traités comme un remboursement d’échec.",
             consume: "Réglé",
             consumeHint: "Réglé d’après le résultat réussi. Si la réserve dépassait le montant final, la différence est enregistrée comme une restitution.",
             refund: "Réserve restituée",
@@ -302,14 +304,15 @@ export const frFR: DeepStringRecord<typeof zhCN> = {
             payNow: "Payer maintenant",
             unavailableTitle: "Recharge en ligne indisponible",
             unavailableDescription: "Aucune offre n'est en vente. Utilisez un code d'échange ou contactez un administrateur.",
-            policyDefault: "Le taux par défaut du site est 1 CNY = 1 crédit, et les crédits peuvent être fractionnaires. Le montant réellement crédité est celui indiqué sur l’offre choisie ; les offres promotionnelles peuvent différer du taux par défaut.",
+            policyDefault:
+                "Le taux par défaut du site est 1 CNY = 1 crédit, et les crédits peuvent être fractionnaires. Le montant réellement crédité est celui indiqué sur l’offre choisie ; les offres promotionnelles peuvent différer du taux par défaut.",
             policySelected: "Offre sélectionnée : payer {{price}}, recevoir {{credits}} crédits.",
             policySelectedMatches: "Cette offre correspond au taux par défaut de 1 CNY = 1 crédit.",
             policySelectedDiffers: "Cette offre diffère du taux par défaut de 1 CNY = 1 crédit ; le montant de crédits indiqué s’applique.",
             policyUnspecified: "La durée de validité des crédits, le retrait du solde et le remboursement des recharges n’ont pas été publiés ; aucun engagement n’est pris ici.",
             policyBillingSummary: "Comment la génération est facturée",
-            policyBillingDetail: "La génération place d’abord une réserve, puis règle après un résultat réussi. Un échec avéré sans preuve de succès restitue les crédits réservés. Si l’amont a réussi mais que l’enregistrement local a échoué, ou si un délai laisse les frais incertains, l’entrée passe en vérification et n’est pas automatiquement remboursée comme un échec. Voir l’historique des crédits.",
-
+            policyBillingDetail:
+                "La génération place d’abord une réserve, puis règle après un résultat réussi. Un échec avéré sans preuve de succès restitue les crédits réservés. Si l’amont a réussi mais que l’enregistrement local a échoué, ou si un délai laisse les frais incertains, l’entrée passe en vérification et n’est pas automatiquement remboursée comme un échec. Voir l’historique des crédits.",
         },
     },
     payment: {

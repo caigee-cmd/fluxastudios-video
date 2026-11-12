@@ -240,14 +240,16 @@ export const enUS: DeepStringRecord<typeof zhCN> = {
         redeemPlaceholder: "Enter the 32-character redeem code",
         redeemSubmit: "Redeem",
         historyDescription: "Includes top-ups, redemptions, generation holds, successful settlement, returns after a clear failure, and items pending review.",
-        historyBillingHint: "Generation first places a hold, then settles on success. A clear failure with no evidence of success returns the hold. If upstream succeeded but local saving failed, or the outcome timed out and is unclear, the charge is pending review and is not automatically refunded as a failure.",
+        historyBillingHint:
+            "Generation first places a hold, then settles on success. A clear failure with no evidence of success returns the hold. If upstream succeeded but local saving failed, or the outcome timed out and is unclear, the charge is pending review and is not automatically refunded as a failure.",
         historyLoadFailed: "Failed to load records",
         historyEmpty: "No credit records yet",
         historyEmptyHint: "Records appear here after you top up, redeem or run generation tasks.",
         pageOf: "Page {{page}} / {{total}}",
         ledger: {
             reserve: "Hold",
-            reserveHint: "Credits are held when generation starts and settled after success. A clear failure with no evidence of success returns the hold. Timeouts or an upstream success that failed to save locally go to pending review and are not automatically treated as a failed refund.",
+            reserveHint:
+                "Credits are held when generation starts and settled after success. A clear failure with no evidence of success returns the hold. Timeouts or an upstream success that failed to save locally go to pending review and are not automatically treated as a failed refund.",
             consume: "Settled",
             consumeHint: "Settled against the successful result. If the hold was higher than the final charge, the difference is recorded as a return.",
             refund: "Hold returned",
@@ -307,8 +309,8 @@ export const enUS: DeepStringRecord<typeof zhCN> = {
             policySelectedDiffers: "This plan differs from the default 1 CNY = 1 credit rate; the labeled credit amount applies.",
             policyUnspecified: "Credit expiry, balance withdrawals, and top-up payment refunds have not been published, so no promise is made here.",
             policyBillingSummary: "How generation is charged",
-            policyBillingDetail: "Generation first places a hold and settles after a successful result. A clear failure with no evidence of success returns the held credits. If upstream succeeded but local saving failed, or a timeout leaves the charge unclear, the entry goes to pending review and is not automatically refunded as a failure. See Credit history for details.",
-
+            policyBillingDetail:
+                "Generation first places a hold and settles after a successful result. A clear failure with no evidence of success returns the held credits. If upstream succeeded but local saving failed, or a timeout leaves the charge unclear, the entry goes to pending review and is not automatically refunded as a failure. See Credit history for details.",
         },
     },
     payment: {

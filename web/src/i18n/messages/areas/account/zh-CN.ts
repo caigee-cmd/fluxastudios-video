@@ -302,7 +302,6 @@ export const zhCN = {
             policyUnspecified: "积分有效期、余额提现和充值资金退款规则尚未公布，这里不作承诺。",
             policyBillingSummary: "生成如何扣费",
             policyBillingDetail: "开始生成会先预冻结；成功后按实际结果结算。明确失败且没有成功计费证据时退回冻结积分。上游已成功但本地保存失败，或超时等费用状态不明时进入待核对，不会自动按失败退款。详情见「积分消耗历史」。",
-
         },
     },
     payment: {

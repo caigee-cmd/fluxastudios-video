@@ -4,11 +4,7 @@ import type { LogicalModelQuote } from "@/services/api/logical-models";
 
 export type RouteQuoteStatus = "disabled" | "idle" | "loading" | "ready" | "unavailable";
 
-export type VisibleRouteQuote =
-    | { kind: "hidden" }
-    | { kind: "loading" }
-    | { kind: "unavailable" }
-    | { kind: "ready"; credits: number; estimated: boolean; description: string };
+export type VisibleRouteQuote = { kind: "hidden" } | { kind: "loading" } | { kind: "unavailable" } | { kind: "ready"; credits: number; estimated: boolean; description: string };
 
 /**
  * 按钮旁只展示当前询价结果。加载中或失败时不沿用旧报价，也不把缺失报价显示成 0 积分免费。
@@ -39,15 +35,7 @@ export function visibleConfiguredCredits(enabled: boolean, credits: number | nul
 }
 
 /** 有报价请求时只用服务端 quote；没有请求时才回退到本地配置价。加载中不混用旧报价或本地价。 */
-export function composerQuoteView(options: {
-    enabled: boolean;
-    hasQuoteRequest: boolean;
-    status: RouteQuoteStatus;
-    quote: LogicalModelQuote | null;
-    taskCount?: number;
-    localCredits?: number | null;
-}): VisibleRouteQuote {
+export function composerQuoteView(options: { enabled: boolean; hasQuoteRequest: boolean; status: RouteQuoteStatus; quote: LogicalModelQuote | null; taskCount?: number; localCredits?: number | null }): VisibleRouteQuote {
     if (options.hasQuoteRequest) return visibleRouteQuote(options.enabled, options.status, options.quote, options.taskCount ?? 1);
     return visibleConfiguredCredits(options.enabled, options.localCredits);
 }
-
