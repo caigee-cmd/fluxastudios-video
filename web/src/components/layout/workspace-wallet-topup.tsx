@@ -7,6 +7,7 @@ import { PaymentBrandIcon } from "@/components/payment-brand-icons";
 import { formatCredits } from "@/constant/credits";
 import { currentLocale, translate } from "@/i18n";
 import { accountStorageMeter, accountStorageStateMessage, formatStorageCapacity, formatStorageDate, formatStorageDuration } from "@/lib/account-storage-usage";
+import { creditTopupGrant, isCreditTopupProduct } from "@/lib/topup-credit-policy";
 import { estimatePaymentCharge, type PaymentOption } from "@/lib/payment-options";
 import { cn } from "@/lib/utils";
 import { formatPaymentAmount, type TopupProduct, type TopupProductKind } from "@/services/api/payments";
@@ -38,6 +39,27 @@ function productAvailability(product: TopupProduct) {
 /** 选中商品的权益摘要，结算栏与卡片共用。 */
 export function topupProductValue(product: TopupProduct) {
     return product.kind === "storage" ? `+${formatStorageCapacity(product.storageBytes)}` : translate("account.wallet.topup.creditsValue", { amount: formatCredits(product.creditsMicrocredits, 6) });
+}
+
+function WalletTopupPolicy({ product }: { product?: TopupProduct }) {
+    const { t } = useTranslation();
+    const grant = product && isCreditTopupProduct(product) ? creditTopupGrant(product) : null;
+    return (
+        <aside className="wallet-topup-policy">
+            <p>{t("account.wallet.topup.policyDefault")}</p>
+            {product && grant ? (
+                <p>
+                    {t("account.wallet.topup.policySelected", { price: formatPaymentAmount(product.amountFen, product.currency), credits: formatCredits(grant.creditsMicrocredits, 6) })}
+                    {grant.matchesDefaultCnyRate ? t("account.wallet.topup.policySelectedMatches") : t("account.wallet.topup.policySelectedDiffers")}
+                </p>
+            ) : null}
+            <p>{t("account.wallet.topup.policyUnspecified")}</p>
+            <details>
+                <summary>{t("account.wallet.topup.policyBillingSummary")}</summary>
+                <p>{t("account.wallet.topup.policyBillingDetail")}</p>
+            </details>
+        </aside>
+    );
 }
 
 function ProductCard({ product, selected, onSelect }: { product: TopupProduct; selected: boolean; onSelect: () => void }) {
@@ -225,6 +247,7 @@ export function WalletTopupPanel({
 
     return (
         <div className="workspace-wallet-content wallet-topup">
+            <WalletTopupPolicy product={selectedProduct} />
             <div ref={groupsRef} className="wallet-topup-groups">
                 {kinds.map((kind) => (
                     <TopupGroup key={kind} kind={kind} products={byKind[kind]} selectedProductId={selectedProduct?.id || ""} onSelectProduct={onSelectProduct}>

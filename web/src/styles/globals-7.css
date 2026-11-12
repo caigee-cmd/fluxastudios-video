@@ -36,6 +36,16 @@
     font-size: 11px;
 }
 
+.workspace-wallet-history-hint {
+    max-width: 46em;
+    line-height: 1.5;
+    white-space: normal;
+}
+
+.workspace-wallet-ledger-hint {
+    white-space: nowrap;
+}
+
 .workspace-wallet-section-heading > svg {
     width: 20px;
     height: 20px;

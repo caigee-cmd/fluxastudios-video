@@ -212,4 +212,15 @@ export const jaJP: DeepStringRecord<typeof zhCN> = {
         uploadHintImage: "画像に対応。アップロード後ライブラリに保存されます",
         uploadHintEagle: "現在の Eagle フォルダに書き込みます。Eagle は現在画像ファイルのみ対応しています",
     },
+    credits: {
+        estimating: "見積もり中",
+        unavailable: "見積もりできません",
+        hint: "料金は現在のモデルとパラメータから見積もり、成功後に決済します。明確な失敗では凍結分を返還し、タイムアウトや保存失敗は確認待ちになります。",
+        estimatedAmount: "見積 {{amount}}",
+        amount: "{{amount}}",
+        sendWithEstimate: "見積 {{amount}} クレジットで送信",
+        sendWithAmount: "{{amount}} クレジットを消費して送信",
+        generateWithEstimate: "見積 {{amount}} クレジットで生成",
+        generateWithAmount: "{{amount}} クレジットを消費して生成",
+    },
 };

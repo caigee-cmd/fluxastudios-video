@@ -210,4 +210,15 @@ export const zhCN = {
         uploadHintImage: "支持图片，上传后保存到素材库",
         uploadHintEagle: "写入当前 Eagle 文件夹；Eagle 当前支持图片文件",
     },
+    credits: {
+        estimating: "估价中",
+        unavailable: "暂无法预估",
+        hint: "费用按当前模型与参数预估，成功后结算；明确失败会退回冻结积分，超时或保存异常将待核对。",
+        estimatedAmount: "预估 {{amount}}",
+        amount: "{{amount}}",
+        sendWithEstimate: "预估 {{amount}} 积分，发送",
+        sendWithAmount: "消耗 {{amount}} 积分，发送",
+        generateWithEstimate: "预估 {{amount}} 积分，生成",
+        generateWithAmount: "消耗 {{amount}} 积分，生成",
+    },
 };

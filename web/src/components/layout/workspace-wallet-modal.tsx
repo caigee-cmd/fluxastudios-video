@@ -12,6 +12,7 @@ import { formatCredits } from "@/constant/credits";
 import { currentLocale } from "@/i18n";
 import { useAccountFileStorageUsage } from "@/hooks/use-account-file-storage-usage";
 import { accountFileStorageUsageQueryKey, accountStorageMeter } from "@/lib/account-storage-usage";
+import { ledgerExplanationKey, ledgerSignedMicrocredits, ledgerTitleKey } from "@/lib/credit-ledger-display";
 import { generationErrorMessage } from "@/lib/generation-error";
 import { estimatePaymentCharge, paymentOptionsFromProviders, type PaymentOption } from "@/lib/payment-options";
 import { getPaymentSettings, listPaymentProviders, listTopupProducts, type PaymentOrder, type TopupProduct, type TopupProductKind } from "@/services/api/payments";
@@ -356,6 +357,7 @@ export function WorkspaceWalletModal({
                                 <div>
                                     <h3>{t("account.wallet.tabHistory")}</h3>
                                     <p>{t("account.wallet.historyDescription")}</p>
+                                    <p className="workspace-wallet-history-hint">{t("account.wallet.historyBillingHint")}</p>
                                 </div>
                                 <Button type="text" icon={<RefreshCw />} loading={walletLoading} onClick={() => void reloadWallet(page)}>
                                     {t("common.refresh")}
@@ -426,34 +428,27 @@ export function WorkspaceWalletModal({
 
 function WalletLedgerRow({ entry }: { entry: CreditLedgerEntry }) {
     const { t } = useTranslation();
-    const positive = entry.amountMicrocredits > 0;
+    const amount = ledgerSignedMicrocredits(entry);
+    const positive = amount > 0;
     // 方舟素材组费用不是模型调用：标题按场景显示，说明只展示组名或退回原因。
     const arkGroup = entry.scene === "ark_asset_group";
     const note = entry.note ? (arkGroup ? entry.note : generationErrorMessage(entry.note)) : "";
-    const title = arkGroup
-        ? t("account.wallet.ledger.arkAssetGroup")
-        : entry.type === "consume"
-          ? t("account.wallet.ledger.consume")
-          : entry.type === "refund"
-            ? t("account.wallet.ledger.refund")
-            : entry.type === "payment_topup"
-              ? t("account.wallet.ledger.paymentTopup")
-              : entry.type === "redeem"
-                ? t("account.wallet.ledger.redeem")
-                : entry.type === "referral_commission"
-                  ? t("account.wallet.ledger.referral")
-                  : note || t("account.wallet.ledger.adjust");
+    const title = arkGroup ? t("account.wallet.ledger.arkAssetGroup") : t(ledgerTitleKey(entry.type));
+    const hintKey = arkGroup ? "" : ledgerExplanationKey(entry.type);
+    const hint = hintKey ? t(hintKey) : "";
+    const spec = (arkGroup ? [note] : [entry.model, entry.scene, note]).filter(Boolean);
     return (
-        <article className="workspace-wallet-ledger-row">
+        <article className="workspace-wallet-ledger-row" title={hint}>
             <span className={cn("workspace-wallet-ledger-icon", positive ? "is-income" : "is-consume")}>{positive ? <Coins /> : <CreditCard />}</span>
             <div>
                 <strong>{title}</strong>
-                <span>{(arkGroup ? [note] : [entry.scene, entry.model, note]).filter(Boolean).join(" · ") || t("account.wallet.ledger.change")}</span>
+                {spec.length ? <span>{spec.join(" · ")}</span> : null}
+                {hint ? <span className="workspace-wallet-ledger-hint">{hint}</span> : null}
             </div>
             <time>{new Date(entry.createdAt).toLocaleString(currentLocale(), { hour12: false })}</time>
             <b className={positive ? "is-income" : "is-consume"}>
                 {positive ? "+" : ""}
-                {formatCredits(entry.amountMicrocredits, 6)}
+                {formatCredits(amount, 6)}
             </b>
         </article>
     );

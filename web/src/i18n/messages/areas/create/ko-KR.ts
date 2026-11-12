@@ -212,4 +212,15 @@ export const koKR: DeepStringRecord<typeof zhCN> = {
         uploadHintImage: "이미지를 지원하며 업로드 후 라이브러리에 저장됩니다",
         uploadHintEagle: "현재 Eagle 폴더에 저장합니다. Eagle은 현재 이미지 파일만 지원합니다",
     },
+    credits: {
+        estimating: "견적 중",
+        unavailable: "견적할 수 없음",
+        hint: "요금은 현재 모델과 파라미터로 추정되며, 성공 후 정산됩니다. 명확한 실패는 동결분을 반환하고, 시간 초과나 저장 실패는 확인 대기가 됩니다.",
+        estimatedAmount: "예상 {{amount}}",
+        amount: "{{amount}}",
+        sendWithEstimate: "예상 {{amount}} 크레딧, 보내기",
+        sendWithAmount: "{{amount}} 크레딧 사용, 보내기",
+        generateWithEstimate: "예상 {{amount}} 크레딧, 생성",
+        generateWithAmount: "{{amount}} 크레딧 사용, 생성",
+    },
 };

@@ -552,6 +552,17 @@
     width: 14px;
     height: 14px;
 }
+.creation-submit-cost.is-pending {
+    color: var(--user-ink-muted);
+}
+.creation-credit-hint {
+    flex: 1 1 160px;
+    min-width: 0;
+    margin: 0;
+    color: var(--user-ink-muted, #6c6c72);
+    font-size: 11px;
+    line-height: 1.4;
+}
 /* 开始创作：与 composer 里其他控件同高（34px）的统一主按钮，墨色实底 + 内高光，不做胶囊、扫光或加粗。
    外层 antd 文字按钮只负责点击与禁用语义，视觉全部画在 .creation-submit-action 上。 */
 @layer utilities {

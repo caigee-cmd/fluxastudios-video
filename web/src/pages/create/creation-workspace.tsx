@@ -21,6 +21,8 @@ import { SpotlightSurface } from "@/components/ui/aceternity/spotlight-surface";
 import { ModelPicker } from "@/components/model-picker";
 import { aceternityMotion } from "@/lib/aceternity-motion";
 import { CreditSymbol, requestCreditCost } from "@/constant/credits";
+import { useRouteModelQuote } from "@/hooks/use-route-model-quote";
+import { useTranslation } from "react-i18next";
 import { ASSET_CATEGORY_LABELS } from "@/lib/asset-category";
 import { formatShotOrdinal } from "@/lib/shot-label";
 import { buildImageResolutionOptions, formatImageResolutionSize, supportsImageResolutionPresets } from "@/lib/image-resolution-tiers";
@@ -30,11 +32,11 @@ import { mediaSettingIssues } from "@/lib/media-settings";
 import { MediaSettingsNotice } from "@/components/media-settings-notice";
 import { mergedImageCapabilityConfig, type ModelRequirements } from "@/lib/model-selection";
 import { imageQualityLabel } from "@/lib/image-quality";
-import { modelQuoteDescription, modelQuoteRequest } from "@/lib/model-pricing";
-import { quoteModel, type LogicalModelQuote } from "@/services/api/logical-models";
+import { modelQuoteRequest } from "@/lib/model-pricing";
+import { composerQuoteView } from "@/lib/route-quote-display";
 import { modelOptionName, resolveModelChannel, type AiConfig } from "@/stores/use-config-store";
 import { useUserStore } from "@/stores/use-user-store";
-import { useGenerationBatchLimit, batchQuoteTotal } from "@/lib/generation-batch-limit";
+import { useGenerationBatchLimit } from "@/lib/generation-batch-limit";
 import type { PromptOptimizerProvider } from "@/lib/plugins/plugin-types";
 import { type CreationReference } from "./creation-references";
 import { creationAttachmentKind, type CreationAttachment, type CreationMode } from "./creation-assets";
@@ -208,6 +210,7 @@ type ComposerProps = {
 type CreationReferenceFilter = "all" | "image" | "video" | "audio" | "file";
 
 export function CreationComposer(props: ComposerProps) {
+    const { t } = useTranslation();
     const [previewUrl, setPreviewUrl] = useState("");
     const [previewType, setPreviewType] = useState<"image" | "video">("image");
     const [promptOptimizerOpen, setPromptOptimizerOpen] = useState(false);
@@ -233,7 +236,7 @@ export function CreationComposer(props: ComposerProps) {
     // 服务端按单任务报价，图片按每单 1 张询价，显示时再乘实际单数。
     const quoteRequirements = useMemo(() => (props.mode === "image" ? { ...props.modelRequirements, options: { ...props.modelRequirements.options, count: 1 } } : props.modelRequirements), [props.mode, props.modelRequirements]);
     const quoteRequest = useMemo(() => modelQuoteRequest(props.config, props.model, props.mode, quoteRequirements), [props.config, props.mode, props.model, quoteRequirements]);
-    const [routeQuote, setRouteQuote] = useState<LogicalModelQuote | null>(null);
+    const { quote: routeQuote, status: routeQuoteStatus } = useRouteModelQuote(Boolean(creditsEnabled && quoteRequest), quoteRequest);
     const canOptimizePrompt = Boolean(props.promptOptimizerProvider) && (props.mode === "image" || props.mode === "video");
     const optimizerReferences = props.references.filter((reference) => reference.active && reference.kind !== "skill");
     const credits = requestCreditCost({
@@ -246,24 +249,27 @@ export function CreationComposer(props: ComposerProps) {
         config: props.config,
         requirements: props.modelRequirements,
     });
-    useEffect(() => {
-        if (!creditsEnabled || !quoteRequest) {
-            setRouteQuote(null);
-            return;
-        }
-        const controller = new AbortController();
-        setRouteQuote(null);
-        quoteModel(quoteRequest, controller.signal)
-            .then(({ quote }) => setRouteQuote(quote))
-            .catch(() => {
-                if (!controller.signal.aborted) setRouteQuote(null);
-            });
-        return () => controller.abort();
-    }, [creditsEnabled, quoteRequest]);
-    const generationCredits = routeQuote ? batchQuoteTotal(routeQuote.amountMicrocredits, props.mode === "image" ? imageTaskCount : 1) : credits;
-    const showCost = creditsEnabled && generationCredits !== null && generationCredits !== undefined;
-    const formattedCredits = generationCredits?.toLocaleString("zh-CN", { maximumFractionDigits: 6 });
-    const actionLabel = props.referenceReplacementBusy ? "正在替换参考图" : interactionBusy || (props.generationActive && !canSubmit) ? "生成中" : showCost ? `${routeQuote?.estimated ? "预估" : "消耗"} ${formattedCredits} 积分，发送` : "发送";
+    const quoteView = composerQuoteView({
+        enabled: Boolean(creditsEnabled),
+        hasQuoteRequest: Boolean(quoteRequest),
+        status: routeQuoteStatus,
+        quote: routeQuote,
+        taskCount: props.mode === "image" ? imageTaskCount : 1,
+        localCredits: credits,
+    });
+    const showCost = quoteView.kind === "ready" || quoteView.kind === "loading";
+    const formattedCredits = quoteView.kind === "ready" ? quoteView.credits.toLocaleString("zh-CN", { maximumFractionDigits: 6 }) : "";
+    const costAction =
+        quoteView.kind === "ready"
+            ? t(quoteView.estimated ? "create.credits.sendWithEstimate" : "create.credits.sendWithAmount", { amount: formattedCredits })
+            : quoteView.kind === "loading"
+              ? t("create.credits.estimating")
+              : quoteView.kind === "unavailable"
+                ? t("create.credits.unavailable")
+                : "";
+    const creditHint = creditsEnabled ? t("create.credits.hint") : "";
+    const costTitle = [creditHint, quoteView.kind === "ready" ? quoteView.description : ""].filter(Boolean).join(" ");
+    const actionLabel = props.referenceReplacementBusy ? "正在替换参考图" : interactionBusy || (props.generationActive && !canSubmit) ? "生成中" : costAction || "发送";
     // Send-button working state must span the WHOLE generation (not just the
     // submit-lock window): spinner + glow stay while a message is pending and
     // the composer is empty; typing a next prompt returns the arrow so the
@@ -579,6 +585,13 @@ export function CreationComposer(props: ComposerProps) {
                         </Tooltip>
                     ) : null}
                 </div>
+                {creditsEnabled ? (
+                    <p className="creation-credit-hint" title={costTitle || creditHint}>
+                        {creditHint}
+                        {quoteView.kind === "loading" ? ` · ${t("create.credits.estimating")}` : null}
+                        {quoteView.kind === "unavailable" ? ` · ${t("create.credits.unavailable")}` : null}
+                    </p>
+                ) : null}
                 <Button
                     type="text"
                     className={`creation-submit ${showCost ? "has-cost" : ""}`}
@@ -591,13 +604,18 @@ export function CreationComposer(props: ComposerProps) {
                     }
                     onClick={interactionBusy ? undefined : props.onSubmit}
                     aria-label={actionLabel}
-                    title={!canSubmit && !interactionBusy ? "输入创作想法后即可生成" : actionLabel}
+                    title={!canSubmit && !interactionBusy ? "输入创作想法后即可生成" : costTitle || actionLabel}
                 >
                     {showWorkingGlow ? <WorkingGlow active color="var(--creation-text)" radius="var(--button-radius)" /> : null}
-                    {showCost ? (
-                        <span className="creation-submit-cost" title={routeQuote ? modelQuoteDescription(routeQuote) : undefined}>
+                    {quoteView.kind === "loading" ? (
+                        <span className="creation-submit-cost is-pending" aria-live="polite">
                             <CreditSymbol />
-                            <span>{routeQuote?.estimated ? `预估:${formattedCredits}` : formattedCredits}</span>
+                            <span>{t("create.credits.estimating")}</span>
+                        </span>
+                    ) : quoteView.kind === "ready" ? (
+                        <span className="creation-submit-cost" title={costTitle}>
+                            <CreditSymbol />
+                            <span>{t(quoteView.estimated ? "create.credits.estimatedAmount" : "create.credits.amount", { amount: formattedCredits })}</span>
                         </span>
                     ) : null}
                     <span className="creation-submit-action" aria-hidden>
