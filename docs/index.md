@@ -2,6 +2,12 @@
 
 面向 AI 的短索引。详细文档维护规则见 [AGENTS.md](../AGENTS.md) 第 9 节「文档与交付」。
 
+## Fluxa Studios
+
+- [后台配置、当前状态与发布原则](fluxa-admin-and-releases.md)：管理后台入口、当前模型与套餐状态、只更新前端的原则（可单独公开）。
+- [积分说明](fluxa-credit-explanation.md)：用户可见的兑换、估价与流水口径。
+- [运维速查](fluxa-studios-ops.md)：自建镜像发布与部署约束。
+
 ## 部署与更新入口
 
 用户要求部署服务器时，默认使用官方 Release 镜像、`docker-compose.deploy.yml` 和 Host Updater。本地 SQLite 构建与自定义 Compose 不属于后台在线更新管理范围。
