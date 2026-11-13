@@ -88,3 +88,5 @@ SGP3 的 Host Updater 是 systemd 服务 `open-ai-canvas-updater.service`，程�
 ## 5. 积分说明与配置维护
 
 用户可见的兑换说明、生成估价和流水文案见 [fluxa-credit-explanation.md](./fluxa-credit-explanation.md)。那份文档列出了未公布的有效期/提现/充值退款政策，以及上架积分套餐时如何与默认 1 元 1 积分对齐。不要在未公布政策前把它写成永久有效或一概不退。
+
+后台改价格、时长、清晰度展示、套餐和支付开关的入口，以及当前已落地的模型/套餐状态、只更新前端的原则，见可单独公开的 [fluxa-admin-and-releases.md](./fluxa-admin-and-releases.md)。
