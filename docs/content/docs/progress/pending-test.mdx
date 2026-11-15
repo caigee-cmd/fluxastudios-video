@@ -5,6 +5,12 @@ description: 当前项目已实现功能的手工验证清单与未确认边界
 
 # 待测试
 
+## Grok Image 比例尺寸不再被通用补全拒绝
+
+- 已实现：插件清单自己读取 `request.aspectRatio`（如 Grok Image 在 `/images/generations` 上发送 `aspect_ratio`）时，通用图片补全不再因比例值缺少像素换算而拒绝，也不再额外注入 `size` 字段。
+- 本地验证：`internal/protocol` 包测试通过；新增 Grok 专项覆盖 `1:1`、`16:9` 与像素尺寸 `1824x1024` 在带图片参数时映射为 `aspect_ratio` 与 `resolution`，且不下发 `size`。
+- [ ] 生产以 Grok Imagine 2.0 / Quality 各真实出图一张，核对画面、尺寸、计费单与冻结 / 结算流水。
+
 ## 网站访问统计
 
 - 已实现：独立管理员页面、匿名白名单采集、365 天保留、概览与上期对比、今日小时及近五分钟活跃、排行与三类 CSV、热力和参与度，以及首次观测/回访、首末页、相邻路径、意图漏斗与 KPI 提示。Schema 99 仅追加事件表。

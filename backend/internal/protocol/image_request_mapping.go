@@ -58,9 +58,12 @@ func completeCommonImageRequest(spec RequestSpec, operation ManifestOperation, r
 		}
 		return true
 	}
+	// A manifest that reads request.aspectRatio owns the size mapping (e.g. Grok
+	// sends aspect_ratio on /images/generations); do not inject or reject size.
+	manifestOwnsSize := manifestConsumesImageValue(operation, "request.aspectRatio")
 	// A raw adapter call has no saved presets available for conversion. Reject
 	// mismatched shapes instead of sending them under a standard API field.
-	if openAI && strings.Contains(request.AspectRatio, ":") && !manifestDeclaresImageField(operation, "size") || gemini && strings.Contains(request.AspectRatio, "x") && !manifestDeclaresImageField(operation, "generationConfig.imageConfig.aspectRatio") {
+	if openAI && !manifestOwnsSize && strings.Contains(request.AspectRatio, ":") && !manifestDeclaresImageField(operation, "size") || gemini && strings.Contains(request.AspectRatio, "x") && !manifestDeclaresImageField(operation, "generationConfig.imageConfig.aspectRatio") {
 		return RequestSpec{}, fmt.Errorf("图片参数 size 缺少目标接口的 %s 尺寸转换", encoding)
 	}
 	names := map[string]bool{}
@@ -74,7 +77,7 @@ func completeCommonImageRequest(spec RequestSpec, operation ManifestOperation, r
 		if openAI {
 			switch name {
 			case "size":
-				if request.AspectRatio != "" {
+				if request.AspectRatio != "" && !manifestOwnsSize {
 					mapped[name] = set("size", request.AspectRatio)
 				}
 			case "quality":
