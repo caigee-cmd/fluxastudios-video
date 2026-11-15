@@ -967,6 +967,26 @@ func TestOfficialGrokImageMapsAspectAndResolution(t *testing.T) {
 	}
 }
 
+func TestOfficialGrokImageKeepsRatioWithImageParameters(t *testing.T) {
+	adapter := officialPackageAdapter(t, "xai-grok-images.yingce-plugin", "grok-image")
+	for _, tc := range []struct{ size, aspect string }{{"1:1", "1:1"}, {"16:9", "16:9"}, {"1824x1024", "16:9"}} {
+		create, err := adapter.BuildCreate(context.Background(), RequestContext{Request: GenerationRequest{
+			Capability: CapabilityImage, Model: "grok-imagine-image", Prompt: "a cat", AspectRatio: tc.size, Resolution: "1k", ImageCount: 1,
+			ImageParameters: map[string]any{"size": tc.size, "imageResolution": "1k", "count": 1},
+		}})
+		if err != nil {
+			t.Fatalf("%s: %v", tc.size, err)
+		}
+		body := manifestTestBody(t, create)
+		if body["aspect_ratio"] != tc.aspect || body["resolution"] != "1k" {
+			t.Fatalf("%s: body = %#v", tc.size, body)
+		}
+		if _, ok := body["size"]; ok {
+			t.Fatalf("%s: size must be omitted: %#v", tc.size, body)
+		}
+	}
+}
+
 func TestOfficialJimengImageSplitsPixelSize(t *testing.T) {
 	adapter := officialPackageAdapter(t, "volcengine-jimeng-image.yingce-plugin", "volcengine-jimeng-image")
 	create, err := adapter.BuildCreate(context.Background(), RequestContext{Request: GenerationRequest{
