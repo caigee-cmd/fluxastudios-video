@@ -9,7 +9,7 @@ import (
 func TestOfficialLxmoneVideoResultURLs(t *testing.T) {
 	providers := []string{
 		"lxmone-wan-videos", "lxmone-wan-channel-s", "lxmone-seedance-videos", "lxmone-h3-max-videos",
-		"lxmone-sd-videos", "lxmone-sd-mini-videos", "lxmone-grok-videos", "lxmone-h3-workflow",
+		"lxmone-sd-videos", "lxmone-sd-mini-videos", "lxmone-grok-videos", "lxmone-seedance-workflow", "lxmone-h3-workflow",
 	}
 	const directURL = "https://cdn.example.com/generated.mp4?signature=test"
 	for _, provider := range providers {

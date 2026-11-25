@@ -4,7 +4,7 @@
 后端从生成的 `lxmone-video-suite.yingce-plugin` 包加载，不依赖系统内置 `host:` 适配器。
 
 协议按中转站公开接口文档 `https://lxmone.xyz/docs/` 的 `/v1/videos` 与 `/v1/videos/generations`
-两套请求体形状编写，拆成 8 个 provider，覆盖该站点当前开放的全部视频模型：
+两套请求体形状编写，拆成 9 个 provider，覆盖该站点当前开放的全部视频模型：
 
 | Provider ID | 覆盖模型 | 创建接口 |
 | --- | --- | --- |
@@ -15,6 +15,7 @@
 | `lxmone-sd-videos` | `sd-2.0-a`、`sd-2.0-b`、`sd-2.0-c`、`sd-2.5-a`、`sd-2.5` | `POST /v1/videos` |
 | `lxmone-sd-mini-videos` | `sd-mini` | `POST /v1/videos` |
 | `lxmone-grok-videos` | `grok-imagine-video`、`grok-imagine-video-1.5`、`grok-imagine-video-1.5S` | `POST /v1/videos/generations` |
+| `lxmone-seedance-workflow` | `seedance2.5`、`seedance-2-5-hc` 等与 MiniMax H3 同请求体的 Seedance | `POST /v1/videos/generations` |
 | `lxmone-h3-workflow` | `minimax-h3-a`~`minimax-h3-e` | `POST /v1/videos/generations` |
 
 完整字段、请求模板与响应映射见 [docs/interface.md](docs/interface.md)。

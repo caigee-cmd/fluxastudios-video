@@ -5,6 +5,13 @@ description: 当前项目已实现功能的手工验证清单与未确认边界
 
 # 待测试
 
+## 万有引力 Seedance 工作流协议
+
+- 已实现：`lxmone-video-suite` 增加 `lxmone-seedance-workflow`，请求体与现有 `lxmone-h3-workflow`（`minimax-h3-a`~`e`）相同，创建 `POST /v1/videos/generations`，字段为 `seconds`、`resolution`、`aspect_ratio`、`input_reference`、`first_frame`、`last_frame`、`audio`。原 `lxmone-seedance-videos` 仍走 `/v1/videos`。
+- 已打包：`lxmone-video-suite.yingce-plugin` 已更新为 1.0.2，包内 `manifest.json`、`README.md`、`docs/interface.md` 与源码目录一致。
+- 未测试：按要求未运行协议测试，生产渠道尚未改成该协议。
+- [ ] 后台把对应 Seedance 模型的协议改为 `lxmone-seedance-workflow` 后，核对创建请求字段与 H3 一致，并完成一次真实出片。
+
 ## Grok Image 比例尺寸不再被通用补全拒绝
 
 - 已实现：插件清单自己读取 `request.aspectRatio`（如 Grok Image 在 `/images/generations` 上发送 `aspect_ratio`）时，通用图片补全不再因比例值缺少像素换算而拒绝，也不再额外注入 `size` 字段。

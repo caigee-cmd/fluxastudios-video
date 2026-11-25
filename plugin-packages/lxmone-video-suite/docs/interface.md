@@ -11,7 +11,7 @@
 - 参考媒体要求公开可访问的 HTTPS URL（`requiresPublicMediaUrls`）。
 
 以上形状来自中转站公开文档 `https://lxmone.xyz/docs/`：同一批模型的 `model`、`prompt`、时长、
-分辨率与画幅字段名在不同渠道并不一致，因此按上游请求体拆成 8 个 provider，而不是一个通用协议。
+分辨率与画幅字段名在不同渠道并不一致，因此按上游请求体拆成 9 个 provider，而不是一个通用协议。
 
 ## 配置字段
 
@@ -74,6 +74,13 @@
 `POST /v1/videos/generations`，字段：`model`、`prompt`、`duration`、`aspect_ratio`、`resolution`、
 `generate_audio`，以及互斥的 `image{url}`（首帧）或 `reference_images[{url}]`（参考图）。
 
+### `lxmone-seedance-workflow`（与 MiniMax H3 工作流同请求体的 Seedance）
+
+`POST /v1/videos/generations`，字段与 `lxmone-h3-workflow` 相同：`model`、`prompt`、`seconds`、
+`resolution`、`aspect_ratio`、`input_reference[]`、`first_frame`、`last_frame`、`audio`。
+用于 `seedance2.5`、`seedance-2-5-hc` 等走该请求体的模型；`seedance2.0-a`~`f`、`seedance2.5-a`
+仍使用 `lxmone-seedance-videos` 的 `/v1/videos`。
+
 ### `lxmone-h3-workflow`（`minimax-h3-a`~`minimax-h3-e`）
 
 `POST /v1/videos/generations`，字段：`model`、`prompt`、`seconds`、`resolution`、`aspect_ratio`、
@@ -109,7 +116,7 @@ HTTP 失败、业务错误码或状态进入 `failed` 时，任务以失败结�
   "name": "万有引力视频套件",
   "version": "1.0.2",
   "author": "Yingce / 万有引力",
-  "description": "万有引力（lxmone.xyz）视频协议套件：Wan 3.0（现有渠道与 S 渠道）、Seedance 2 / 2.5、SD 2.0 / 2.5 / Mini、Grok Imagine、MiniMax H3（Max 与 A-E 独立工作流）。",
+  "description": "万有引力（lxmone.xyz）视频协议套件：Wan 3.0（现有渠道与 S 渠道）、Seedance 2 / 2.5、SD 2.0 / 2.5 / Mini、Grok Imagine、MiniMax H3（Max 与 A-E 独立工作流）与同请求体的 Seedance 工作流。",
   "permissions": [
     "generation.run",
     "media.read"
@@ -2020,6 +2027,346 @@ HTTP 失败、业务错误码或状态进入 `failed` 时，任务以失败结�
             },
             "generate_audio": {
               "$ref": "request.generateAudio"
+            }
+          }
+        },
+        "poll": {
+          "method": "GET",
+          "path": "/v1/videos/generations/{{taskId}}",
+          "contentType": "application/json"
+        },
+        "response": {
+          "taskId": {
+            "$coalesce": [
+              {
+                "$ref": "response.id"
+              },
+              {
+                "$ref": "response.task_id"
+              },
+              {
+                "$ref": "response.taskId"
+              },
+              {
+                "$ref": "response.request_id"
+              },
+              {
+                "$ref": "response.data.id"
+              },
+              "taskId"
+            ]
+          },
+          "status": {
+            "$coalesce": [
+              {
+                "$ref": "response.status"
+              },
+              {
+                "$ref": "response.state"
+              },
+              {
+                "$ref": "response.data.status"
+              },
+              "pending"
+            ]
+          },
+          "message": {
+            "$coalesce": [
+              {
+                "$ref": "response.error.message"
+              },
+              {
+                "$ref": "response.message"
+              },
+              {
+                "$ref": "response.fail_reason"
+              }
+            ]
+          },
+          "videos": {
+            "$coalesce": [
+              {
+                "$ref": "response.metadata.direct_url"
+              },
+              {
+                "$ref": "response.data.metadata.direct_url"
+              },
+              {
+                "$ref": "response.metadata.url"
+              },
+              {
+                "$ref": "response.metadata.video_url"
+              },
+              {
+                "$ref": "response.video_url"
+              },
+              {
+                "$ref": "response.videoUrl"
+              },
+              {
+                "$ref": "response.result_url"
+              },
+              {
+                "$ref": "response.url"
+              },
+              {
+                "$ref": "response.data.metadata.url"
+              },
+              {
+                "$ref": "response.data.video_url"
+              },
+              {
+                "$ref": "response.output.url"
+              }
+            ]
+          },
+          "errorPaths": [
+            "error.message",
+            "error.code"
+          ],
+          "resultEphemeral": true
+        }
+      },
+      {
+        "id": "lxmone-seedance-workflow",
+        "label": "万有引力 Seedance 工作流",
+        "description": "seedance2.5、seedance-2-5-hc 等走 POST /v1/videos/generations 的 Seedance：字段与 MiniMax H3 工作流相同，seconds、resolution、aspect_ratio、input_reference、first_frame、last_frame、audio。",
+        "capabilities": [
+          "video"
+        ],
+        "scopes": [
+          "admin.system-channel",
+          "user.custom-channel",
+          "canvas",
+          "creation",
+          "agent"
+        ],
+        "baseUrl": "https://lxmone.xyz/v1",
+        "requiresPublicMediaUrls": true,
+        "auth": {
+          "type": "bearer",
+          "field": "apiKey"
+        },
+        "parameters": [
+          {
+            "name": "model",
+            "type": "string",
+            "required": true,
+            "mapping": "model",
+            "description": "上游模型 ID。"
+          },
+          {
+            "name": "prompt",
+            "type": "string",
+            "required": true,
+            "mapping": "prompt",
+            "description": "视频提示词。"
+          },
+          {
+            "name": "images",
+            "type": "media[]",
+            "required": false,
+            "mapping": "reference_images",
+            "description": "参考图片，宿主发布为公开 URL 后提交。"
+          },
+          {
+            "name": "videos",
+            "type": "media[]",
+            "required": false,
+            "mapping": "reference_videos",
+            "description": "参考视频。"
+          },
+          {
+            "name": "audios",
+            "type": "media[]",
+            "required": false,
+            "mapping": "reference_audios",
+            "description": "参考音频。"
+          },
+          {
+            "name": "duration",
+            "type": "integer",
+            "required": false,
+            "mapping": "seconds/duration/duration_seconds",
+            "description": "输出时长，单位秒。"
+          },
+          {
+            "name": "aspectRatio",
+            "type": "string",
+            "required": false,
+            "mapping": "aspect_ratio",
+            "description": "画幅比例。"
+          },
+          {
+            "name": "resolution",
+            "type": "string",
+            "required": false,
+            "mapping": "resolution/size",
+            "description": "输出分辨率档位。"
+          },
+          {
+            "name": "generateAudio",
+            "type": "boolean",
+            "required": false,
+            "mapping": "audio/generate_audio",
+            "description": "是否生成或保留音频。"
+          }
+        ],
+        "create": {
+          "method": "POST",
+          "path": "/v1/videos/generations",
+          "contentType": "application/json",
+          "body": {
+            "model": {
+              "$ref": "request.model"
+            },
+            "prompt": {
+              "$ref": "request.prompt"
+            },
+            "seconds": {
+              "$if": {
+                "condition": {
+                  "$gt": [
+                    {
+                      "$ref": "request.duration"
+                    },
+                    0
+                  ]
+                },
+                "then": {
+                  "$ref": "request.duration"
+                },
+                "else": 5
+              }
+            },
+            "resolution": {
+              "$lower": {
+                "$coalesce": [
+                  {
+                    "$ref": "request.resolution"
+                  },
+                  "720p"
+                ]
+              }
+            },
+            "aspect_ratio": {
+              "$coalesce": [
+                {
+                  "$ref": "request.aspectRatio"
+                },
+                "16:9"
+              ]
+            },
+            "input_reference": {
+              "$omitEmpty": {
+                "$map": {
+                  "from": {
+                    "$filter": {
+                      "from": {
+                        "$ref": "request.images"
+                      },
+                      "as": "media",
+                      "where": {
+                        "$and": [
+                          {
+                            "$ne": [
+                              {
+                                "$ref": "media.role"
+                              },
+                              "first_frame"
+                            ]
+                          },
+                          {
+                            "$ne": [
+                              {
+                                "$ref": "media.role"
+                              },
+                              "last_frame"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "as": "media",
+                  "in": {
+                    "$ref": "media.value"
+                  }
+                }
+              }
+            },
+            "first_frame": {
+              "$omitEmpty": {
+                "$first": {
+                  "$map": {
+                    "from": {
+                      "$filter": {
+                        "from": {
+                          "$ref": "request.images"
+                        },
+                        "as": "media",
+                        "where": {
+                          "$eq": [
+                            {
+                              "$ref": "media.role"
+                            },
+                            "first_frame"
+                          ]
+                        }
+                      }
+                    },
+                    "as": "media",
+                    "in": {
+                      "$ref": "media.value"
+                    }
+                  }
+                }
+              }
+            },
+            "last_frame": {
+              "$omitEmpty": {
+                "$first": {
+                  "$map": {
+                    "from": {
+                      "$filter": {
+                        "from": {
+                          "$ref": "request.images"
+                        },
+                        "as": "media",
+                        "where": {
+                          "$eq": [
+                            {
+                              "$ref": "media.role"
+                            },
+                            "last_frame"
+                          ]
+                        }
+                      }
+                    },
+                    "as": "media",
+                    "in": {
+                      "$ref": "media.value"
+                    }
+                  }
+                }
+              }
+            },
+            "audio": {
+              "$omitEmpty": {
+                "$first": {
+                  "$map": {
+                    "from": {
+                      "$sortByOrder": {
+                        "$ref": "request.audios"
+                      }
+                    },
+                    "as": "media",
+                    "in": {
+                      "$ref": "media.value"
+                    }
+                  }
+                }
+              }
             }
           }
         },
