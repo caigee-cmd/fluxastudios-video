@@ -971,7 +971,7 @@ test("视频支持模式平铺多选，默认模式只能取已勾选值，最�
     } finally {
         await fixture.close();
     }
-}
+});
 
 test("完整模型编辑器：未操作保存保留参考视频计价及独立成本", async () => {
     const values = { ...draft(), capability: "video" as const, protocol: "video-test", referenceVideoBilling: true, capabilityConfig: defaultModelCapabilityConfig("video-test") };

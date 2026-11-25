@@ -4,7 +4,7 @@ export type LedgerDisplayType = CreditLedgerEntry["type"] | "reserve" | "signup_
 
 /** 展示用的有符号微积分：预冻结流水可能只写了可用/冻结差额，未填 amount。 */
 export function ledgerSignedMicrocredits(entry: Pick<CreditLedgerEntry, "type" | "amountMicrocredits" | "availableDeltaMicrocredits" | "reservedDeltaMicrocredits">) {
-    if (entry.type === "reserve") {
+    if ((entry.type as string) === "reserve") {
         if (entry.amountMicrocredits) return entry.amountMicrocredits;
         if (entry.availableDeltaMicrocredits) return entry.availableDeltaMicrocredits;
         if (entry.reservedDeltaMicrocredits) return -Math.abs(entry.reservedDeltaMicrocredits);

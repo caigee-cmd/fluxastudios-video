@@ -136,7 +136,6 @@ export function CanvasNodePromptPanel({
     const themeName = useActiveTheme();
     const theme = canvasThemes[themeName];
     const creditsEnabled = useUserStore((state) => state.features.creditsEnabled);
-    const { t } = useTranslation();
     // 画布节点选几张等于拆几单，上限按账号同时任务数。
     const batchLimit = useGenerationBatchLimit();
     const promptOptimizerInstallation = usePluginStore((state) => state.installations.find((item) => item.manifest.id === PROMPT_OPTIMIZER_PLUGIN_ID));
@@ -558,7 +557,15 @@ export function CanvasNodePromptPanel({
                         <span>{t(quoteView.estimated ? "create.credits.estimatedAmount" : "create.credits.amount", { amount: formattedCredits })}</span>
                     </span>
                 ) : null}
-                <button type="button" className="canvas-node-generate-button" disabled={isSubmitDisabled} aria-busy={isRunning} aria-label={actionLabel} title={videoIssue || costTitle || actionLabel} onClick={() => (expanded ? submitExpandedPrompt() : submit())}>
+                <button
+                    type="button"
+                    className="canvas-node-generate-button"
+                    disabled={isSubmitDisabled}
+                    aria-busy={isRunning}
+                    aria-label={actionLabel}
+                    title={videoIssue || costTitle || actionLabel}
+                    onClick={() => (expanded ? submitExpandedPrompt() : submit())}
+                >
                     {isRunning ? <LoaderCircle className="animate-spin motion-reduce:animate-none" aria-hidden /> : <ArrowUp aria-hidden />}
                 </button>
             </div>
